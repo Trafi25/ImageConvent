@@ -4,7 +4,11 @@ using System.Text;
 
 namespace Conventor.ImageConcept
 {
-    class ImageCons
+    public abstract  class Image
     {
+        public abstract ImageHeader Header { get; set; }
+        public abstract string Path { get; set; }
+
+       //  ImageColor 
     }
 }
