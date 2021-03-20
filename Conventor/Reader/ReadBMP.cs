@@ -31,15 +31,40 @@ namespace Conventor.Reader
             {
                 headerBMP[i] = fileData[i];
             }
+
+            // Getting file size from BMP heade
+
+            byte[] fileSizeHeaderInfo = new byte[4];
+
+            //needed fix for the correct byte shift (data[i] = i << shiftValue)
+            for (int i = 2, j = 0; j < fileSizeHeaderInfo.Length; i++, j++)
+            {
+                fileSizeHeaderInfo[j] = fileData[i];
+            }
+
+
+            uint fileSize;  // Ай нужно будет поменять в будующем
+            fileSize = BMPGetFileSize(ref fileSizeHeaderInfo);         
+                    }
+
+        uint BMPGetFileSize(ref byte[] headerPart)
+        {
+            uint fileSize = (uint)fileData[5] << 24
+                            | (uint)fileData[4] << 16
+                            | (uint)fileData[3] << 8
+                            | (uint)fileData[2];
+
+            return fileSize;
         }
+
+
 
         public Image Read(string path)
         {
             try
-            {
-                ReadBMP objDataInfo = new ReadBMP();
-                objDataInfo.ReadFile(path);
-                objDataInfo.BMPGetHeader();
+            {               
+                ReadFile(path);
+                BMPGetHeader();
             }
             catch (Exception exc)
             {
