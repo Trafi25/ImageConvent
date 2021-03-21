@@ -10,6 +10,14 @@ namespace Conventor.Reader
     class ReadJPEG : IImageReader
     {
         private byte[] fileData;
+        private List<int> Hi=new List<int>();
+        private List<int> Vi = new List<int>();
+        private List<int> QuantizationId = new List<int>();
+        private List<int> ChannelDCcoef = new List<int>();
+        private List<int> ChannelACcoef = new List<int>();
+        private int Height;
+        private int Width;
+
         internal void ReadFile(string path)
         {
             FileStream fs = new FileStream(path, FileMode.Open);
@@ -26,17 +34,6 @@ namespace Conventor.Reader
                 hex.AppendFormat("{0:x2}", b);
             }
             return hex.ToString();            
-        }
-
-        private byte[] HexString2Bytes(string hexString)
-        {
-            int bytesCount = (hexString.Length) / 2;
-            byte[] bytes = new byte[bytesCount];
-            for (int x = 0; x < bytesCount; ++x)
-            {
-                bytes[x] = Convert.ToByte(hexString.Substring(x * 2, 2), 16);
-            }
-            return bytes;
         }
 
         public void Analyze(string hex)
@@ -124,13 +121,19 @@ namespace Conventor.Reader
             Console.WriteLine($"Size of Quantiztion:{size}");
             int Precision = int.Parse(hex.Substring(4,2));
             Console.WriteLine($"Precision:{Precision}");
-            int heigth = int.Parse(hex.Substring(6,4),System.Globalization.NumberStyles.HexNumber);
-            int width = int.Parse(hex.Substring(10, 4), System.Globalization.NumberStyles.HexNumber);
+            Height = int.Parse(hex.Substring(6,4),System.Globalization.NumberStyles.HexNumber);
+            Width = int.Parse(hex.Substring(10, 4), System.Globalization.NumberStyles.HexNumber);
             int NumberOfChannels = int.Parse(hex.Substring(14, 2), System.Globalization.NumberStyles.HexNumber);
-            Console.WriteLine($"heigth:{heigth}");
-            Console.WriteLine($"width:{width}");
-            Console.WriteLine($"NumberOfChannels:{NumberOfChannels}");
-            //add here foreach NumberOfChannels
+            Console.WriteLine($"heigth:{Height}");
+            Console.WriteLine($"width:{Width}");
+            Console.WriteLine($"NumberOfChannels:{NumberOfChannels}");            
+            for(int i=0;i<NumberOfChannels;i++)
+            {
+                string ChannelsInfo = hex.Substring(16+6*i,6);
+                Hi.Add(int.Parse(ChannelsInfo[2].ToString()));
+                Vi.Add(int.Parse(ChannelsInfo[3].ToString()));
+                QuantizationId.Add(int.Parse(ChannelsInfo.Substring(4),System.Globalization.NumberStyles.HexNumber));
+            }            
             hex = hex.Substring(size * 2);
             return hex;
         }
@@ -141,12 +144,15 @@ namespace Conventor.Reader
             string sizestr = hex.Substring(0, 4);
             int size = int.Parse(sizestr, System.Globalization.NumberStyles.HexNumber);
             Console.WriteLine($"Size of DHTSection:{size}");
-            int HoffmanClass = int.Parse(hex[4].ToString());
+            int HaffmanClass = int.Parse(hex[4].ToString());
             int TableId = int.Parse(hex[5].ToString());
             string DHTSection = hex.Substring(6, (size - 3) * 2);
-            Console.WriteLine($"HoffmanClass:{HoffmanClass}");
+            string NumberOfCodes = DHTSection.Substring(0, 32);
+            string MeaningOfCodes = DHTSection.Substring(32);
+            Console.WriteLine($"HoffmanClass:{HaffmanClass}");
             Console.WriteLine($"TableId:{TableId}");
-            Console.WriteLine($"DHTSection:{DHTSection}");
+            Console.WriteLine($"NumberOfCodes:{NumberOfCodes}");
+            Console.WriteLine($"MeaningOfCodes:{MeaningOfCodes}");
             hex = hex.Substring(size * 2);
             return hex;
         }
@@ -157,8 +163,13 @@ namespace Conventor.Reader
             string sizestr = hex.Substring(0, 4);
             int size = int.Parse(sizestr, System.Globalization.NumberStyles.HexNumber);
             Console.WriteLine($"Size of StartOfScan:{size}");
-            int NumberOfChannels = int.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
-            //add here foreach NumberOfChannels
+            int NumberOfChannels = int.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);            
+            for(int i=0; i< NumberOfChannels; i++)
+            {
+                string ChannelsInfo = hex.Substring(6 + 4 * i, 4);
+                ChannelDCcoef.Add(int.Parse(ChannelsInfo[2].ToString()));
+                ChannelACcoef.Add(int.Parse(ChannelsInfo[3].ToString()));
+            }            
             hex = hex.Substring(size * 2);
             string EncodedData = hex.Substring(0,hex.Length-4);
             Console.WriteLine($"EncodedData:{EncodedData}");
