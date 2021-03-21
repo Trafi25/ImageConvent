@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Conventor.Reader;
+using System;
 
 namespace Conventor
 {
@@ -7,6 +8,8 @@ namespace Conventor
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+            ReadJPEG test = new ReadJPEG();
+            test.Read(@"C:\Users\user\Desktop\Комп графика\Testing image.jpg");
         }
     }
 }
