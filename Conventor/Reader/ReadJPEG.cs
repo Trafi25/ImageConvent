@@ -1,5 +1,6 @@
 ﻿using Conventor.ImageConcept;
 using Conventor.Interfaces;
+using Conventor.Structures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,8 +16,11 @@ namespace Conventor.Reader
         private List<int> QuantizationId = new List<int>();
         private List<int> ChannelDCcoef = new List<int>();
         private List<int> ChannelACcoef = new List<int>();
+        private List<HuffmanTree> DC = new List<HuffmanTree>() { new HuffmanTree(),new HuffmanTree() };
+        private List<HuffmanTree> AC = new List<HuffmanTree>() { new HuffmanTree(), new HuffmanTree() };
         private int Height;
         private int Width;
+
 
         internal void ReadFile(string path)
         {
@@ -153,8 +157,37 @@ namespace Conventor.Reader
             Console.WriteLine($"TableId:{TableId}");
             Console.WriteLine($"NumberOfCodes:{NumberOfCodes}");
             Console.WriteLine($"MeaningOfCodes:{MeaningOfCodes}");
+            HexToHuffmanTree(HaffmanClass,TableId,NumberOfCodes,MeaningOfCodes);
             hex = hex.Substring(size * 2);
             return hex;
+        }
+
+        private void HexToHuffmanTree(int HaffmanClass,int TableId,string NumberOfCodes,string MeaningOfCodes)
+        {
+            if(HaffmanClass==0)
+            {
+                for(int i=0;i<16;i++)
+                {
+                    string NumberOfCode = NumberOfCodes.Substring(0+2*i,2);
+                    int counter = int.Parse(NumberOfCode, System.Globalization.NumberStyles.HexNumber);
+                    while (counter > 0)
+                    {
+                        string CodeValue = MeaningOfCodes.Substring(0, 2);
+                        MeaningOfCodes = MeaningOfCodes.Substring(2);
+                        DC[TableId].PushFromHex(CodeValue,i+1);
+                        DC[TableId].ResetCurrentNode();
+                        counter--;
+                    }
+                    if(MeaningOfCodes.Length==0)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+
+            }
         }
 
         private string StartOfScan(string hex)

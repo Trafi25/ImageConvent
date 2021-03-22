@@ -6,11 +6,10 @@ namespace Conventor.Structures
 {
     class HuffmanTree
     {
-        private string value;
         private HuffmanNode head=new HuffmanNode();
         private HuffmanNode currentNode=new HuffmanNode();
 
-        HuffmanTree()
+        public HuffmanTree()
         {
             head.value = "None";
             head.level = 0;
@@ -34,12 +33,14 @@ namespace Conventor.Structures
                 {
                     HuffmanNode temp = new HuffmanNode();
                     temp.value = value;
+                    temp.level = currentNode.level;
                     currentNode.left = temp;
                 }
                 else
                 {
                     HuffmanNode temp = new HuffmanNode();
                     temp.value = value;
+                    temp.level = currentNode.level;
                     currentNode.right = temp;
                 }
             }
@@ -49,6 +50,7 @@ namespace Conventor.Structures
                 {
                     HuffmanNode temp = new HuffmanNode();
                     temp.value = "None";
+                    temp.level = currentNode.level;
                     currentNode.left = temp;
                     currentNode = temp;
                 }
@@ -56,11 +58,18 @@ namespace Conventor.Structures
                 {
                     HuffmanNode temp = new HuffmanNode();
                     temp.value = "None";
+                    temp.level = currentNode.level;
                     currentNode.right = temp;
                     currentNode = temp;
                 }
                 PushFromHex(value,level);
             }
+        }
+
+        public void ResetCurrentNode()
+        {
+            head.level = 0;
+            currentNode = head;
         }
     }
 }
