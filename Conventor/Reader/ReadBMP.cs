@@ -12,6 +12,7 @@ namespace Conventor.Reader
     class ReadBMP : IImageReader
     {
         byte[] fileData;
+        int PixelStartAddress;
         internal byte[] ReadFile(string path)
         {
             FileStream fs = new FileStream(path, FileMode.Open);
@@ -34,22 +35,38 @@ namespace Conventor.Reader
 
             // Getting file size from BMP heade
 
-            byte[] fileSizeHeaderInfo = new byte[4];
+            byte[] fileHeaderInfo = new byte[4];
 
             //needed fix for the correct byte shift (data[i] = i << shiftValue)
-            for (int i = 2, j = 0; j < fileSizeHeaderInfo.Length; i++, j++)
+            for (int i = 2, j = 0; j < fileHeaderInfo.Length; i++, j++)
             {
-                fileSizeHeaderInfo[j] = fileData[i];
+                fileHeaderInfo[j] = fileData[i];
             }
 
 
             uint fileSize;  // Ай нужно будет поменять в будующем
-            fileSize = BMPGetFileSize(ref fileSizeHeaderInfo);         
-                    }
+            fileSize = BMPGetFileSize(ref fileHeaderInfo);
+            
+
+            // Getting the address of the starting byte at which the bitmap data (array of pixels) can be found
+
+            byte[] filePixelArrayAddress = new byte[4];
+
+            for (int i = 10, j = 0; j < filePixelArrayAddress.Length; i++, j++)
+            {
+                filePixelArrayAddress[j] = fileData[i];
+            }
+
+          PixelStartAddress = BMPGetStartAddress(ref filePixelArrayAddress);
+
+
+
+        }
 
         uint BMPGetFileSize(ref byte[] headerPart)
         {
-            uint fileSize = (uint)fileData[5] << 24
+            uint fileSize = (uint)fileData[5] << 32
+                            | (uint)fileData[5] << 24
                             | (uint)fileData[4] << 16
                             | (uint)fileData[3] << 8
                             | (uint)fileData[2];
@@ -57,13 +74,31 @@ namespace Conventor.Reader
             return fileSize;
         }
 
+        private string BytesToHexString(byte[] buffer)
+        {
+            var hex = new StringBuilder(buffer.Length * 2);
+            foreach (byte b in buffer)
+            {
+                hex.AppendFormat("{0:x2}", b);
+            }
+            return hex.ToString();
+        }
 
+        int BMPGetStartAddress(ref byte[] headerPart)
+        {
+            int resultAddress = 0;
+
+            for (int i = 0; i < headerPart.Length; i++)   resultAddress += headerPart[i];
+
+            return resultAddress;
+        }
 
         public Image Read(string path)
         {
             try
             {               
                 ReadFile(path);
+                string hex = BytesToHexString(fileData);               
                 BMPGetHeader();
             }
             catch (Exception exc)
