@@ -18,6 +18,7 @@ namespace Conventor.Reader
         private List<int> ChannelACcoef = new List<int>();
         private List<HuffmanTree> DC = new List<HuffmanTree>() { new HuffmanTree(),new HuffmanTree() };
         private List<HuffmanTree> AC = new List<HuffmanTree>() { new HuffmanTree(), new HuffmanTree() };
+        private List<int[,]> QuantMatrix = new List<int[,]>() { new int[8,8], new int[8,8] };
         private int Height;
         private int Width;
 
@@ -113,8 +114,60 @@ namespace Conventor.Reader
             Console.WriteLine($"LengthOfValues:{LengthOfValues}");
             Console.WriteLine($"MatrixId:{MatrixId}");
             Console.WriteLine($"QuantizationMatrix:{QuantizationMatrix}");
+            ZigZagQuantization(QuantizationMatrix, LengthOfValues, MatrixId);
             hex = hex.Substring(size*2);
             return hex;
+        }
+
+        private void ZigZagQuantization(string QuantizationMatrix, int LengthOfValues, int MatrixId)
+        {
+            int[,] Matrix = new int[8,8];
+            int TempI = 0;
+            int TempJ = 0;
+            LengthOfValues *= 2;
+            string temp = QuantizationMatrix.Substring(0, LengthOfValues);
+            QuantizationMatrix = QuantizationMatrix.Substring(LengthOfValues);
+            Matrix[TempI, TempJ] = int.Parse(temp, System.Globalization.NumberStyles.HexNumber);
+            while (QuantizationMatrix.Length>0)
+            {                
+                temp = QuantizationMatrix.Substring(0,LengthOfValues);
+                QuantizationMatrix = QuantizationMatrix.Substring(LengthOfValues);
+
+                if(TempJ!=7)
+                {
+                    Matrix[TempI, ++TempJ] = int.Parse(temp, System.Globalization.NumberStyles.HexNumber);
+                }
+                else
+                {
+                    Matrix[++TempI, TempJ] = int.Parse(temp, System.Globalization.NumberStyles.HexNumber);
+                }
+               
+                while(TempJ>0 && TempI<7 && TempJ<8)
+                {
+                    temp = QuantizationMatrix.Substring(0, LengthOfValues);
+                    QuantizationMatrix = QuantizationMatrix.Substring(LengthOfValues);
+                    Matrix[++TempI,--TempJ]= int.Parse(temp, System.Globalization.NumberStyles.HexNumber);
+                }
+                temp = QuantizationMatrix.Substring(0, LengthOfValues);
+                QuantizationMatrix = QuantizationMatrix.Substring(LengthOfValues);
+
+                if (TempI == 7)
+                {
+                    Matrix[TempI, ++TempJ] = int.Parse(temp, System.Globalization.NumberStyles.HexNumber);
+                }
+                else
+                {
+                    Matrix[++TempI, TempJ] = int.Parse(temp, System.Globalization.NumberStyles.HexNumber);
+                }
+
+                while (TempI > 0 && TempI < 8 && TempJ < 7)
+                {
+                    temp = QuantizationMatrix.Substring(0, LengthOfValues);
+                    QuantizationMatrix = QuantizationMatrix.Substring(LengthOfValues);
+                    Matrix[--TempI, ++TempJ] = int.Parse(temp, System.Globalization.NumberStyles.HexNumber);
+                }
+            }
+            QuantMatrix[MatrixId] = Matrix;
         }
 
         public string BaselineDCT(string hex)

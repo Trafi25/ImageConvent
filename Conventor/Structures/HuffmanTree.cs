@@ -8,6 +8,7 @@ namespace Conventor.Structures
     {
         private HuffmanNode head=new HuffmanNode();
         private HuffmanNode currentNode=new HuffmanNode();
+        private string TempCode = string.Empty;
 
         public HuffmanTree()
         {
@@ -22,6 +23,7 @@ namespace Conventor.Structures
             public int level;
             public HuffmanNode left;
             public HuffmanNode right;
+            public string code;
             public bool HasChilds = false;            
         }
 
@@ -34,6 +36,8 @@ namespace Conventor.Structures
                     HuffmanNode temp = new HuffmanNode();
                     temp.value = value;
                     temp.level = currentNode.level+1;
+                    TempCode += "0";
+                    temp.code = TempCode;
                     currentNode.left = temp;
                 }
                 else
@@ -41,6 +45,8 @@ namespace Conventor.Structures
                     HuffmanNode temp = new HuffmanNode();
                     temp.value = value;
                     temp.level = currentNode.level+1;
+                    TempCode += "1";
+                    temp.code = TempCode;
                     currentNode.HasChilds = true;
                     currentNode.right = temp;
                 }
@@ -52,21 +58,25 @@ namespace Conventor.Structures
                     HuffmanNode temp = new HuffmanNode();
                     temp.value = "None";
                     temp.level = currentNode.level+1;
+                    TempCode += "0";
                     currentNode.left = temp;
                     currentNode = temp;
                 }else if (currentNode.left != null && currentNode.left.value=="None" && !currentNode.left.HasChilds)
                 {
                     HuffmanNode temp = currentNode.left;
+                    TempCode += "0";
                     currentNode = temp;
                 }else if (currentNode.right != null && currentNode.right.value=="None")
                 {
                     HuffmanNode temp = currentNode.right;
+                    TempCode += "1";
                     currentNode = temp;
                 }else if (currentNode.right==null)
                 {
                     HuffmanNode temp = new HuffmanNode();
                     temp.value = "None";
                     temp.level = currentNode.level+1;
+                    TempCode += "1";
                     currentNode.right = temp;
                     currentNode = temp;
                 }
@@ -75,7 +85,8 @@ namespace Conventor.Structures
         }
 
         public void ResetCurrentNode()
-        {                      
+        {
+            TempCode = string.Empty;
             currentNode = head;
         }
     }
