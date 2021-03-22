@@ -186,7 +186,23 @@ namespace Conventor.Reader
             }
             else
             {
-
+                for (int i = 0; i < 16; i++)
+                {
+                    string NumberOfCode = NumberOfCodes.Substring(0 + 2 * i, 2);
+                    int counter = int.Parse(NumberOfCode, System.Globalization.NumberStyles.HexNumber);
+                    while (counter > 0)
+                    {
+                        string CodeValue = MeaningOfCodes.Substring(0, 2);
+                        MeaningOfCodes = MeaningOfCodes.Substring(2);
+                        AC[TableId].PushFromHex(CodeValue, i + 1);
+                        AC[TableId].ResetCurrentNode();
+                        counter--;
+                    }
+                    if (MeaningOfCodes.Length == 0)
+                    {
+                        break;
+                    }
+                }
             }
         }
 
