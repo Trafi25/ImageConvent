@@ -59,6 +59,7 @@ namespace Conventor.Structures
                     temp.value = "None";
                     temp.level = currentNode.level+1;
                     TempCode += "0";
+                    temp.code = TempCode;
                     currentNode.left = temp;
                     currentNode = temp;
                 }else if (currentNode.left != null && currentNode.left.value=="None" && !currentNode.left.HasChilds)
@@ -77,11 +78,44 @@ namespace Conventor.Structures
                     temp.value = "None";
                     temp.level = currentNode.level+1;
                     TempCode += "1";
+                    temp.code = TempCode;
                     currentNode.right = temp;
                     currentNode = temp;
                 }
                 PushFromHex(value,level);
             }
+        }
+
+        public void FindCoef(string EncodedData)
+        {
+            while (EncodedData.Length>0)
+            {
+                if(currentNode.left==null && currentNode.right==null)
+                {
+                    return;
+                }
+                string temp = EncodedData.Substring(0, 1);
+                EncodedData = EncodedData.Substring(1);
+                if(temp=="0")
+                {
+                    HuffmanNode tempNode = currentNode;
+                    currentNode = tempNode.left;
+                }else if(temp=="1")
+                {
+                    HuffmanNode tempNode = currentNode;
+                    currentNode = tempNode.right;
+                }
+            }
+        }
+
+        public string GetCode()
+        {
+            return currentNode.code;
+        }
+
+        public string GetValue()
+        {
+            return currentNode.value;
         }
 
         public void ResetCurrentNode()
