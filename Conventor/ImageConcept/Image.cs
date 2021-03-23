@@ -9,6 +9,6 @@ namespace Conventor.ImageConcept
         public abstract ImageHeader Header { get; set; }
         public abstract string Path { get; set; }
 
-       //  ImageColor 
+        public abstract Pixel[,] Color { get; set; }
     }
 }
