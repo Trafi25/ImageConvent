@@ -123,5 +123,7 @@ namespace Conventor.Structures
             TempCode = string.Empty;
             currentNode = head;
         }
+
+
     }
 }

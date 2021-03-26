@@ -4,6 +4,7 @@ using Conventor.Structures;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Conventor.Reader
@@ -19,11 +20,13 @@ namespace Conventor.Reader
         private List<HuffmanTree> DC = new List<HuffmanTree>() { new HuffmanTree(),new HuffmanTree() };
         private List<HuffmanTree> AC = new List<HuffmanTree>() { new HuffmanTree(), new HuffmanTree() };
         private List<int[,]> QuantMatrix = new List<int[,]>() { new int[8,8], new int[8,8] };
+        private List<int[,]> Luminance = new List<int[,]>();
+        private List<int[,]> Chrominance = new List<int[,]>();
         private int Height;
         private int Width;
 
 
-        internal void ReadFile(string path)
+        private void ReadFile(string path)
         {
             FileStream fs = new FileStream(path, FileMode.Open);
             fileData = new byte[fs.Length];
@@ -275,8 +278,70 @@ namespace Conventor.Reader
             hex = hex.Substring(size * 2);
             string EncodedData = hex.Substring(0,hex.Length-4);
             Console.WriteLine($"EncodedData:{EncodedData}");
+            string binarystring = String.Join(String.Empty,
+                  EncodedData.Select(
+                    c => Convert.ToString(Convert.ToInt32(c.ToString(), 16), 2).PadLeft(4, '0')
+                  )
+                );
+            Encoding(binarystring);
             hex = hex.Substring(hex.Length - 4);
             return hex;
+        }
+
+        private void Encoding(string EncodedData)
+        {
+            while (EncodedData.Length > 0)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    for (int i = 0; i < Hi[j] * Vi[j]; i++)
+                    {
+                        int[,] temp = new int[8, 8];
+                        int TempI = 0;
+                        int TempJ = 0;
+                        DC[ChannelDCcoef[j]].FindCoef(EncodedData);
+                        EncodedData = EncodedData.Substring(DC[ChannelDCcoef[j]].GetCode().Length);
+                        int NodeValue = int.Parse(DC[ChannelDCcoef[j]].GetValue(), System.Globalization.NumberStyles.HexNumber);
+                        if (NodeValue==0)
+                        {
+                            temp[0, 0] = 0;
+                            EncodedData = EncodedData.Substring(NodeValue);
+                        }
+                        else
+                        {
+                            string binaryDCcoef = EncodedData.Substring(0, NodeValue);
+                            EncodedData= EncodedData.Substring(NodeValue);
+                            if(binaryDCcoef[0]=='1')
+                            {
+                                temp[0, 0] = Convert.ToInt32(binaryDCcoef, 2);
+                            }
+                            else
+                            {
+                                temp[0, 0] = (int)(Convert.ToInt32(binaryDCcoef, 2) - Math.Pow(2, binaryDCcoef.Length) + 1);
+                            }
+                            EncodedData = EncodedData.Substring(binaryDCcoef.Length);
+                        }
+                        DC[ChannelDCcoef[j]].ResetCurrentNode();
+                        for(int t=0;t<63;t++)
+                        {
+                            AC[ChannelACcoef[j]].FindCoef(EncodedData);
+                            string Node = AC[ChannelACcoef[j]].GetValue();
+                            if (int.Parse(Node, System.Globalization.NumberStyles.HexNumber)==0)
+                            {
+                                break;
+                            }
+
+                            int NumberOfZeros=int.Parse(Node[1].ToString(),System.Globalization.NumberStyles.HexNumber);
+                            int CoefSize= int.Parse(Node[2].ToString(), System.Globalization.NumberStyles.HexNumber);
+                            while(NumberOfZeros>0)
+                            {
+                                
+                            }    
+                            
+                        }
+                    }
+                }
+            }            
         }
 
         public Image Read(string path)
