@@ -322,6 +322,7 @@ namespace Conventor.Reader
                             EncodedData = EncodedData.Substring(binaryDCcoef.Length);
                         }
                         DC[ChannelDCcoef[j]].ResetCurrentNode();
+                        bool Direction = true;
                         for(int t=0;t<63;t++)
                         {
                             AC[ChannelACcoef[j]].FindCoef(EncodedData);
@@ -335,9 +336,78 @@ namespace Conventor.Reader
                             int CoefSize= int.Parse(Node[2].ToString(), System.Globalization.NumberStyles.HexNumber);
                             while(NumberOfZeros>0)
                             {
-                                
-                            }    
-                            
+                                if(TempI==0 && TempJ!=7)
+                                {
+                                    ++TempJ;
+                                    Direction = true;
+                                }
+                                else if(TempJ==7)
+                                {
+                                    ++TempI;
+                                    Direction = true;
+                                }
+                                else if(TempJ==0 && TempI!=7)
+                                {
+                                    ++TempI;
+                                    Direction = false;
+                                }
+                                else if(TempI==7)
+                                {
+                                    ++TempJ;
+                                    Direction = false;
+                                }
+                                else if (Direction)
+                                {
+                                    ++TempI;
+                                    --TempJ;
+                                }
+                                else if(!Direction)
+                                {
+                                    --TempI;
+                                    ++TempJ;
+                                }
+                                t++;
+                                NumberOfZeros--;
+                            }
+                            EncodedData = EncodedData.Substring(Node.Length);
+                            Node = EncodedData.Substring(0,CoefSize);
+                            int ACcoef=0;
+                            if(Node[0]=='1')
+                            {
+                                ACcoef= Convert.ToInt32(Node, 2);
+                            }
+                            else if(Node[0]=='0')
+                            {
+                                ACcoef = (int)(Convert.ToInt32(Node, 2) - Math.Pow(2, Node.Length) + 1);
+                            }
+                            if (TempI == 0 && TempJ != 7)
+                            {
+                                temp[TempI,++TempJ]=ACcoef;
+                                Direction = true;
+                            }
+                            else if (TempJ == 7)
+                            {
+                                temp[++TempI,TempJ]=ACcoef;
+                                Direction = true;
+                            }
+                            else if (TempJ == 0 && TempI != 7)
+                            {
+                                temp[++TempI, TempJ] = ACcoef;
+                                Direction = false;
+                            }
+                            else if (TempI == 7)
+                            {
+                                temp[TempI, ++TempJ] = ACcoef;
+                                Direction = false;
+                            }
+                            else if (Direction)
+                            {
+                                temp[++TempI, --TempJ] = ACcoef;                                
+                            }
+                            else if (!Direction)
+                            {
+                                temp[--TempI, ++TempJ] = ACcoef;                                
+                            }
                         }
                     }
                 }
