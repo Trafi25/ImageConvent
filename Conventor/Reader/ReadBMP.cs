@@ -4,21 +4,21 @@ using System.IO;
 using System.Text;
 using Conventor.ImageConcept;
 using Conventor.Interfaces;
-
-
+using Conventor.Writer;
 
 namespace Conventor.Reader
 {
     class ReadBMP : IImageReader
     {
+
         private byte[] fileData;
         private int PixelStartAddress;
-        private int[] tablePixel;
-        private int height=0;
-        private int width=0;
-        private uint fileSize=0;
-        private int reservedFirst =0;
-        private int reservedSecond =0;
+        private byte[] tablePixel;
+        private int height = 0;
+        private int width = 0;
+        private uint fileSize = 0;
+        private int reservedFirst = 0;
+        private int reservedSecond = 0;
         private ImageHeader imgHeadBMP;
 
         private ImageHeader ReadFile(string path)
@@ -26,9 +26,10 @@ namespace Conventor.Reader
             FileStream fs = new FileStream(path, FileMode.Open);
             fileData = new byte[fs.Length];
             fs.Read(fileData, 0, fileData.Length);
-            
-            fs.Close();
 
+
+            fs.Close();
+            imgHeadBMP = new ImageHeader();
             BinaryReader br = new BinaryReader(File.OpenRead(path));
             br.BaseStream.Position = 18;
 
@@ -48,11 +49,16 @@ namespace Conventor.Reader
                 heightBytes[i] = br.ReadByte();
             }
             height = BitConverter.ToInt32(heightBytes, 0);
-            imgHeadBMP.Width = height;
+            imgHeadBMP.Height = height;
+
+
+
+
+
             return imgHeadBMP;
         }
 
-        private void BMPReadPixel()
+        private byte[] BMPReadPixel()
         {
             // initializing the array size of 14 bytes for the BMP header
 
@@ -73,7 +79,7 @@ namespace Conventor.Reader
                 fileHeaderInfo[j] = fileData[i];
             }
 
-                   
+
             fileSize = BMPGetFileSize(ref fileHeaderInfo);
 
             byte[] fileReservedInfo = new byte[4];
@@ -98,17 +104,17 @@ namespace Conventor.Reader
                 filePixelArrayAddress[j] = fileData[i];
             }
 
-          PixelStartAddress = BMPGetStartAddress(ref filePixelArrayAddress);
+            PixelStartAddress = BMPGetStartAddress(ref filePixelArrayAddress);
 
 
-          tablePixel = new int[fileData.Length - PixelStartAddress];
-            int[] bufferTable = new int[3];
+            tablePixel = new byte[fileData.Length - PixelStartAddress];
+            byte[] bufferTable = new byte[3];
 
             for (int i = PixelStartAddress, j = 0, k = 0; i < tablePixel.Length; i++, k++)
             {
                 if (k > 2)
                 {
-                    int tmpValue = 0;
+                    byte tmpValue = 0;
 
                     for (int z = 0; z < k; z++)
                     {
@@ -120,11 +126,13 @@ namespace Conventor.Reader
                     j++;
                     i++;
                 }
-                
+
                 bufferTable[k] = fileData[i];
             }
 
+            //for(int i=0; i<tablePixel.Length;i++) Console.Write(tablePixel[i]);
 
+            return fileData;
 
         }
 
@@ -153,12 +161,12 @@ namespace Conventor.Reader
         {
             int resultAddress = 0;
 
-            for (int i = 0; i < headerPart.Length; i++)   resultAddress += headerPart[i];
+            for (int i = 0; i < headerPart.Length; i++) resultAddress += headerPart[i];
 
             return resultAddress;
         }
 
-         private  int[] BMPGetReservedHeader(ref byte[] headerPart)
+        private int[] BMPGetReservedHeader(ref byte[] headerPart)
         {
             int reservedFirst = headerPart[0] + headerPart[1];
             int reservedSecond = headerPart[2] + headerPart[3];
@@ -173,14 +181,18 @@ namespace Conventor.Reader
         public Image Read(string path)
         {
             Image img = new Image(path);
-          
+
             try
-            {                              
+            {
                 img.Header = ReadFile(path);
-                img.RGBPixel = tablePixel;
                 string hex = BytesToHexString(fileData);
-                BMPReadPixel();
+                img.RGBPixel = BMPReadPixel();
+                //maybe need big refactor
+                Ppm_writer wr = new Ppm_writer();                
+                wr.Write("D:/1.ppm", img);
+                //-------------------
                 return img;
+
             }
             catch (Exception exc)
             {
