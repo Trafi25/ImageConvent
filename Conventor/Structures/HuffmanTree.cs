@@ -82,6 +82,19 @@ namespace Conventor.Structures
                     currentNode.right = temp;
                     currentNode = temp;
                 }
+                else
+                {
+                    if(head.right==null)
+                    {
+                        HuffmanNode temp = new HuffmanNode();
+                        temp.value = "None";
+                        temp.level = head.level + 1;
+                        TempCode = "1";
+                        temp.code = TempCode;
+                        head.right = temp;
+                    }
+                    currentNode = head.right;
+                }
                 PushFromHex(value,level);
             }
         }
