@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Conventor.ImageConcept
 {
-    class Pixel
+    public class ImageColor
     {
         public byte R { get; set; }
         public byte G { get; set; }
@@ -12,12 +12,7 @@ namespace Conventor.ImageConcept
 
         public int? A { get; set; }
 
-        public Pixel(byte r, byte g, byte b)
-        {
-            this.R = r;
-            this.G = g;
-            this.B = b;
-        }
+       
 
     }
 }

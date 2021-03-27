@@ -8,6 +8,6 @@ namespace Conventor.Interfaces
 {
     public interface IConvertor
     {
-        public void Convert(Image image, string destinationPathб ,string originalPath);
+        public void Convert(string destinationPathб ,string originalPath);
     }
 }

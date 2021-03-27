@@ -9,10 +9,11 @@ namespace Conventor
 {
     class Conventor : IConvertor
     {
-        public void Convert(Image image, string destinationPath, string originalPath)
+        public void Convert(string destinationPath, string originalPath)
         {
+            //Image image = new Image();
             ReadJPEG test = new ReadJPEG();
-            Image img = test.Read(originalPath);         
+            Image img = test.Read(originalPath);       
 
         }
     }
