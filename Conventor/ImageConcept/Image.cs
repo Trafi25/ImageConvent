@@ -9,6 +9,7 @@ namespace Conventor.ImageConcept
         public ImageHeader Header { get; set; }
         public  string Path { get; set; }
         public  ImageColor[,] Color { get; set; }
+        public int[] RGBPixel { get; set; }
 
         public  Image(String Path) {
             this.Path = Path;

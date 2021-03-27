@@ -21,7 +21,7 @@ namespace Conventor.Reader
         private int reservedSecond =0;
         private ImageHeader imgHeadBMP;
 
-        internal ImageHeader ReadFile(string path)
+        private ImageHeader ReadFile(string path)
         {
             FileStream fs = new FileStream(path, FileMode.Open);
             fileData = new byte[fs.Length];
@@ -52,7 +52,7 @@ namespace Conventor.Reader
             return imgHeadBMP;
         }
 
-        internal void BMPReadPixel()
+        private void BMPReadPixel()
         {
             // initializing the array size of 14 bytes for the BMP header
 
@@ -128,7 +128,7 @@ namespace Conventor.Reader
 
         }
 
-        uint BMPGetFileSize(ref byte[] headerPart)
+        private uint BMPGetFileSize(ref byte[] headerPart)
         {
             uint fileSize = (uint)fileData[6] << 32
                             | (uint)fileData[5] << 24
@@ -149,7 +149,7 @@ namespace Conventor.Reader
             return hex.ToString();
         }
 
-        int BMPGetStartAddress(ref byte[] headerPart)
+        private int BMPGetStartAddress(ref byte[] headerPart)
         {
             int resultAddress = 0;
 
@@ -158,7 +158,7 @@ namespace Conventor.Reader
             return resultAddress;
         }
 
-        int[] BMPGetReservedHeader(ref byte[] headerPart)
+         private  int[] BMPGetReservedHeader(ref byte[] headerPart)
         {
             int reservedFirst = headerPart[0] + headerPart[1];
             int reservedSecond = headerPart[2] + headerPart[3];
@@ -173,11 +173,11 @@ namespace Conventor.Reader
         public Image Read(string path)
         {
             Image img = new Image(path);
-            IImageReader reader;
-            IImageWriter writer;
+          
             try
             {                              
                 img.Header = ReadFile(path);
+                img.RGBPixel = tablePixel;
                 string hex = BytesToHexString(fileData);
                 BMPReadPixel();
                 return img;
