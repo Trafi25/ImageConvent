@@ -25,7 +25,6 @@ namespace Conventor.Reader
         private int Height;
         private int Width;
 
-
         private void ReadFile(string path)
         {
             FileStream fs = new FileStream(path, FileMode.Open);
@@ -305,7 +304,6 @@ namespace Conventor.Reader
                         if (NodeValue==0)
                         {
                             temp[0, 0] = 0;
-                            EncodedData = EncodedData.Substring(NodeValue);
                         }
                         else
                         {
@@ -319,39 +317,40 @@ namespace Conventor.Reader
                             {
                                 temp[0, 0] = (int)(Convert.ToInt32(binaryDCcoef, 2) - Math.Pow(2, binaryDCcoef.Length) + 1);
                             }
-                            EncodedData = EncodedData.Substring(binaryDCcoef.Length);
                         }
                         DC[ChannelDCcoef[j]].ResetCurrentNode();
-                        bool Direction = true;
+                        bool Direction = false;
                         for(int t=0;t<63;t++)
-                        {
+                        {                            
                             AC[ChannelACcoef[j]].FindCoef(EncodedData);
                             string Node = AC[ChannelACcoef[j]].GetValue();
                             if (int.Parse(Node, System.Globalization.NumberStyles.HexNumber)==0)
                             {
+                                EncodedData = EncodedData.Substring(AC[ChannelACcoef[j]].GetCode().Length);
+                                AC[ChannelACcoef[j]].ResetCurrentNode();
                                 break;
                             }
 
-                            int NumberOfZeros=int.Parse(Node[1].ToString(),System.Globalization.NumberStyles.HexNumber);
-                            int CoefSize= int.Parse(Node[2].ToString(), System.Globalization.NumberStyles.HexNumber);
+                            int NumberOfZeros=int.Parse(Node[0].ToString(),System.Globalization.NumberStyles.HexNumber);
+                            int CoefSize= int.Parse(Node[1].ToString(), System.Globalization.NumberStyles.HexNumber);
                             while(NumberOfZeros>0)
                             {
-                                if(TempI==0 && TempJ!=7)
+                                if(TempI==0 && TempJ!=7 && !Direction)
                                 {
                                     ++TempJ;
                                     Direction = true;
                                 }
-                                else if(TempJ==7)
+                                else if(TempJ==7 && !Direction)
                                 {
                                     ++TempI;
                                     Direction = true;
                                 }
-                                else if(TempJ==0 && TempI!=7)
+                                else if(TempJ==0 && TempI!=7 && Direction)
                                 {
                                     ++TempI;
                                     Direction = false;
                                 }
-                                else if(TempI==7)
+                                else if(TempI==7 && Direction)
                                 {
                                     ++TempJ;
                                     Direction = false;
@@ -369,8 +368,10 @@ namespace Conventor.Reader
                                 t++;
                                 NumberOfZeros--;
                             }
-                            EncodedData = EncodedData.Substring(Node.Length);
+                            EncodedData = EncodedData.Substring(AC[ChannelACcoef[j]].GetCode().Length);
+                            AC[ChannelACcoef[j]].ResetCurrentNode();
                             Node = EncodedData.Substring(0,CoefSize);
+                            EncodedData = EncodedData.Substring(CoefSize);
                             int ACcoef=0;
                             if(Node[0]=='1')
                             {
@@ -380,22 +381,22 @@ namespace Conventor.Reader
                             {
                                 ACcoef = (int)(Convert.ToInt32(Node, 2) - Math.Pow(2, Node.Length) + 1);
                             }
-                            if (TempI == 0 && TempJ != 7)
+                            if (TempI == 0 && TempJ != 7 && !Direction)
                             {
                                 temp[TempI,++TempJ]=ACcoef;
                                 Direction = true;
                             }
-                            else if (TempJ == 7)
+                            else if (TempJ == 7 && !Direction)
                             {
                                 temp[++TempI,TempJ]=ACcoef;
                                 Direction = true;
                             }
-                            else if (TempJ == 0 && TempI != 7)
+                            else if (TempJ == 0 && TempI != 7 && Direction)
                             {
                                 temp[++TempI, TempJ] = ACcoef;
                                 Direction = false;
                             }
-                            else if (TempI == 7)
+                            else if (TempI == 7 && Direction)
                             {
                                 temp[TempI, ++TempJ] = ACcoef;
                                 Direction = false;
@@ -408,6 +409,22 @@ namespace Conventor.Reader
                             {
                                 temp[--TempI, ++TempJ] = ACcoef;                                
                             }
+                        }
+                        if(j==0)
+                        {
+                            if(i>0)
+                            {
+                                temp[0, 0] = temp[0, 0] + Luminance[Luminance.Count - 1][0, 0];
+                            }
+                            Luminance.Add(temp);
+                        }
+                        else
+                        {
+                            if (i > 0)
+                            {
+                                temp[0, 0] = temp[0, 0] + Chrominance[Chrominance.Count - 1][0, 0];
+                            }
+                            Chrominance.Add(temp);
                         }
                     }
                 }
