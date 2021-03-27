@@ -17,10 +17,11 @@ namespace Conventor.Reader
         private int height=0;
         private int width=0;
         private uint fileSize=0;
-        int reservedFirst=0;
-        int reservedSecond=0;
+        private int reservedFirst =0;
+        private int reservedSecond =0;
+        private ImageHeader imgHeadBMP;
 
-        internal byte[] ReadFile(string path)
+        internal ImageHeader ReadFile(string path)
         {
             FileStream fs = new FileStream(path, FileMode.Open);
             fileData = new byte[fs.Length];
@@ -37,6 +38,7 @@ namespace Conventor.Reader
                 widthBbytes[i] = br.ReadByte();
             }
             width = BitConverter.ToInt32(widthBbytes, 0);
+            imgHeadBMP.Width = width;
 
             br.BaseStream.Position = 22;
 
@@ -46,7 +48,8 @@ namespace Conventor.Reader
                 heightBytes[i] = br.ReadByte();
             }
             height = BitConverter.ToInt32(heightBytes, 0);
-            return fileData;
+            imgHeadBMP.Width = height;
+            return imgHeadBMP;
         }
 
         internal void BMPGetHeader()
@@ -117,7 +120,7 @@ namespace Conventor.Reader
                     j++;
                     i++;
                 }
-
+                
                 bufferTable[k] = fileData[i];
             }
 
@@ -170,8 +173,9 @@ namespace Conventor.Reader
         public Image Read(string path)
         {
             try
-            {               
-                ReadFile(path);
+            {
+                Image img= new Image(path);                
+                img.Header = ReadFile(path);
                 string hex = BytesToHexString(fileData);               
                 BMPGetHeader();
             }
