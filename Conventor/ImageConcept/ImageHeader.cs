@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Conventor.ImageConcept
 {
-    public abstract class ImageHeader
+    public class ImageHeader
     {
-        public abstract int Height { get; set; }
-        public abstract int Width { get; set; }        
+        public  int Height { get; set; }
+        public  int Width { get; set; }        
     }
 }

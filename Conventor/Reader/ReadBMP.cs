@@ -52,7 +52,7 @@ namespace Conventor.Reader
             return imgHeadBMP;
         }
 
-        internal void BMPGetHeader()
+        internal void BMPReadPixel()
         {
             // initializing the array size of 14 bytes for the BMP header
 
@@ -172,19 +172,21 @@ namespace Conventor.Reader
 
         public Image Read(string path)
         {
+            Image img = new Image(path);
+            IImageReader reader;
+            IImageWriter writer;
             try
-            {
-                Image img= new Image(path);                
+            {                              
                 img.Header = ReadFile(path);
-                string hex = BytesToHexString(fileData);               
-                BMPGetHeader();
+                string hex = BytesToHexString(fileData);
+                BMPReadPixel();
+                return img;
             }
             catch (Exception exc)
             {
                 Console.WriteLine(exc);
             }
-
-            throw new NotImplementedException();
+            return img;
         }
     }
 }

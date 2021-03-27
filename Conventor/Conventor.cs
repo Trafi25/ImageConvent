@@ -11,7 +11,7 @@ namespace Conventor
     {
         public void Convert(string destinationPath, string originalPath)
         {
-            //Image image = new Image();
+                     
             ReadJPEG test = new ReadJPEG();
             Image img = test.Read(originalPath);       
 
