@@ -8,14 +8,10 @@ namespace Conventor
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            ReadBMP test = new ReadBMP();
-            test.Read("C:/Users/user/Desktop/Комп графика/ImageConvent/Image/1.bmp");
-            
-            //test.Read(@"C:\Users\user\Desktop\Комп графика\Testing image.jpg");
-
-            Conventor convent = new Conventor();
-            //convent.Convert(img, @"C:\Users\user\Desktop\Комп графика\Testing image.jpg", @"D:\1.bmp");
+            string Destination = "";
+            string Original = "";
+            Conventor conventor = new Conventor();
+            conventor.Convert(Destination, Original);
         }
     }
 }
