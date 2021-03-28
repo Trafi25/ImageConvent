@@ -130,7 +130,6 @@ namespace Conventor.Reader
                 bufferTable[k] = fileData[i];
             }
 
-            //for(int i=0; i<tablePixel.Length;i++) Console.Write(tablePixel[i]);
 
             return fileData;
 
