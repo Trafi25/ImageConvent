@@ -58,12 +58,6 @@ namespace Conventor
             {
                 Console.WriteLine(ex.ErrorDetails);
             }
-            Console.WriteLine(source);
-            Console.WriteLine(goalformat);
-            Console.WriteLine(output);
-            Console.WriteLine();
-            Console.WriteLine();
-            string Destination = "";
             if (output.Length == 0)
             {
                 string[] temp = source.Split('.');
