@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Conventor.Exeptions
+namespace Conventor.Exceptions
 {
     class FormatSupportedException:Exception
     {
         public string ErrorDetails; 
-        FormatSupportedException(string message,string format):base(message)
+        public FormatSupportedException(string message,string format):base(message)
         {
             ErrorDetails = $"{message} : {format}";
         }
