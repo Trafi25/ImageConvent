@@ -183,11 +183,7 @@ namespace Conventor.Reader
             {
                 img.Header = ReadFile(path);
                 string hex = BytesToHexString(fileData);
-                img.RGBPixel = BMPReadPixel();
-                //maybe need big refactor
-                Ppm_writer wr = new Ppm_writer();                
-                wr.Write("C:/Users/user/Desktop/Комп графика/ImageConvent/Image/1.ppm", img);
-                //-------------------
+                img.RGBPixel = BMPReadPixel();                
                 return img;
 
             }

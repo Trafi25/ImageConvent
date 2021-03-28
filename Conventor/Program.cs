@@ -64,9 +64,13 @@ namespace Conventor
             Console.WriteLine();
             Console.WriteLine();
             string Destination = "";
-            string Original = "";
+            if (output.Length == 0)
+            {
+                string[] temp = source.Split('.');
+                output = temp[0] + "." + goalformat;
+            }
             Conventor conventor = new Conventor();
-            conventor.Convert(Destination, Original);
+            conventor.Convert(output, source);
         }
     }
 }
