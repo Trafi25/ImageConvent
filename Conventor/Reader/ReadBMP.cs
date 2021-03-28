@@ -111,7 +111,7 @@ namespace Conventor.Reader
             byte[] bufferTable = new byte[3];
            
 
-            int tempNumber = 0;
+            int tempNumber = PixelStartAddress;
             for(int i=height-1;i>=0;i--)
             {
                 for(int j=0;j<width;j++)
