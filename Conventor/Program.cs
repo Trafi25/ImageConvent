@@ -10,7 +10,7 @@ namespace Conventor
         {
             Console.WriteLine("Hello World!");
             ReadBMP test = new ReadBMP();
-            test.Read("D:/1.bmp");
+            test.Read("C:/Users/user/Desktop/Комп графика/ImageConvent/Image/1.bmp");
             
             //test.Read(@"C:\Users\user\Desktop\Комп графика\Testing image.jpg");
 

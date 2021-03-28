@@ -109,29 +109,27 @@ namespace Conventor.Reader
 
             tablePixel = new byte[fileData.Length - PixelStartAddress];
             byte[] bufferTable = new byte[3];
+           
 
-            for (int i = PixelStartAddress, j = 0, k = 0; i < tablePixel.Length; i++, k++)
+            int tempNumber = 0;
+            for(int i=height-1;i>=0;i--)
             {
-                if (k > 2)
+                for(int j=0;j<width;j++)
                 {
-                    byte tmpValue = 0;
 
-                    for (int z = 0; z < k; z++)
+                    for(int k=0;k<3;k++)
                     {
-                        tmpValue += bufferTable[z];
+                        bufferTable[k] = fileData[tempNumber];
+                        tempNumber++;
                     }
-
-                    tablePixel[j] = tmpValue;
-                    k = 0;
-                    j++;
-                    i++;
+                    for (int k = 2; k >= 0; k--)
+                    {
+                        tablePixel[i * width*3 + j * 3 + 2 - k] = bufferTable[k];
+                    }
                 }
-
-                bufferTable[k] = fileData[i];
             }
 
-
-            return fileData;
+            return tablePixel;
 
         }
 
@@ -188,7 +186,7 @@ namespace Conventor.Reader
                 img.RGBPixel = BMPReadPixel();
                 //maybe need big refactor
                 Ppm_writer wr = new Ppm_writer();                
-                wr.Write("D:/1.ppm", img);
+                wr.Write("C:/Users/user/Desktop/Комп графика/ImageConvent/Image/1.ppm", img);
                 //-------------------
                 return img;
 
